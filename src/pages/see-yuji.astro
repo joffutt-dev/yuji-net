@@ -1,0 +1,15 @@
+---
+import Slide from "../components/Slide.astro";
+import FullLayout from "../layouts/FullLayout.astro";
+import "../styles/global.css";
+import YujiHome from "../assets/yujihome.webp";
+---
+
+<FullLayout>
+  <div class="text-center">Coming soon...</div>
+  <div class="carousel cursor-pointer rounded-3xl">
+    <Slide imgLocation={YujiHome} />
+    <Slide imgLocation={YujiHome} />
+    <Slide imgLocation={YujiHome} />
+  </div>
+</FullLayout>

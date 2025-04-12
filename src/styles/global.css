@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+button {
+  @apply btn;
+  @apply bg-blue-800 text-white;
+}
+
+.custom-h {
+  height: calc(100vh - 60px);
+}
+
+.custom-max-h {
+  max-height: calc(100vh - 60px);
+}
+
+.custom-min-h-800 {
+  min-height: 800px;
+}

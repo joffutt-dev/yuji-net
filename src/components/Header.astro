@@ -1,0 +1,22 @@
+---
+
+---
+
+<div class="flex p-1">
+  <button id="home-route">Home</button>
+
+  <button class="ml-auto" id="yuji-route">See Yuji</button>
+  <button class="ml-1">See other cute pets</button>
+</div>
+
+<script>
+  const yujiRoute = document.getElementById("yuji-route");
+  yujiRoute?.addEventListener("click", () => {
+    window.location.href = "/see-yuji";
+  });
+
+  const homeRoute = document.getElementById("home-route");
+  homeRoute?.addEventListener("click", () => {
+    window.location.href = "/";
+  });
+</script>
