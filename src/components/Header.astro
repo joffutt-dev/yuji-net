@@ -12,11 +12,11 @@
 <script>
   const yujiRoute = document.getElementById("yuji-route");
   yujiRoute?.addEventListener("click", () => {
-    window.location.href = "/see-yuji";
+    window.location.href = `${import.meta.env.PUBLIC_BASE_URL}/see-yuji`;
   });
 
   const homeRoute = document.getElementById("home-route");
   homeRoute?.addEventListener("click", () => {
-    window.location.href = "/";
+    window.location.href = `${import.meta.env.PUBLIC_BASE_URL}/`;
   });
 </script>
