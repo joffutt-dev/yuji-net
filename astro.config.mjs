@@ -6,7 +6,7 @@ import vue from '@astrojs/vue';
 
 import { loadEnv } from "vite";
 
-const { PUBLIC_BASE_URL } = loadEnv(process.env.NODE_ENV ?? "", process.cwd(), "");
+const { PUBLIC_BASE_URL, PUBLIC_SITE } = loadEnv(process.env.NODE_ENV ?? "", process.cwd(), "");
 
 // https://astro.build/config
 
@@ -20,5 +20,6 @@ export default defineConfig({
   },
   integrations: [vue()],
   // base: "/yuji-net"
+  site: PUBLIC_SITE,
   base: PUBLIC_BASE_URL
 });
