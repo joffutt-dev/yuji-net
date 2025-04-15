@@ -39,6 +39,8 @@ jobs:
         uses: SpicyPizza/create-envfile@v2.0
         with:
           envkey_PUBLIC_SULLY_URL: ${{ vars.PUBLIC_SULLY_URL }}
+          #should uncomment and test this one at some point
+          #envkey_PUBLIC_SITE: ${{ vars.PUBLIC_SITE }}
           envkey_PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL }}
           directory: .
           file_name: .env

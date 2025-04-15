@@ -6,7 +6,21 @@
   <button id="home-route">Home</button>
 
   <button class="ml-auto" id="yuji-route">See Yuji</button>
-  <button class="ml-1">See other cute pets</button>
+  <div class="dropdown dropdown-hover">
+    <div tabindex={0} class="blue-button">See other cute pets</div>
+    <!-- <div role="button" class="btn m-1">Hover</div> -->
+    <ul
+      tabindex={0}
+      class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+    >
+      <li>
+        <a href={import.meta.env.PUBLIC_SULLY_URL} target="_">See Sully</a>
+      </li>
+      <li>
+        <a href={import.meta.env.PUBLIC_SULLY_URL} target="_">See Tonks</a>
+      </li>
+    </ul>
+  </div>
 </div>
 
 <script>

@@ -6,6 +6,11 @@ button {
   @apply bg-blue-800 text-white;
 }
 
+.blue-button {
+  @apply btn;
+  @apply bg-blue-800 text-white;
+}
+
 .custom-h {
   height: calc(100vh - 60px);
 }
