@@ -6,5 +6,11 @@ import { Image } from "astro:assets";
 <div class="text-center">
   <div class="text-2xl">Welcome to Yuji Net</div>
   <div>A website engineered to show off an adorkable cat</div>
-  <div class="m-4"><Image src={YujiHome} alt="Yuji Picture" /></div>
+  <div class="m-4">
+    <Image
+      class="rounded-md object-contain max-h-lvh max-w-lvw"
+      src={YujiHome}
+      alt="Yuji Picture"
+    />
+  </div>
 </div>

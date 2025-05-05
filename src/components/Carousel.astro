@@ -18,7 +18,11 @@ const {
 } = Astro.props;
 ---
 
-<div class="carousel-container">
+<div
+  class="carousel-container"
+  data-autoplay={autoplay}
+  data-interval={interval}
+>
   <button
     id="prev-button"
     aria-label="previous"
@@ -192,7 +196,7 @@ const {
 
   .display-image {
     max-width: 100%;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100vh - 125px);
     aspect-ratio: auto;
     object-fit: contain;
     transition: opacity 0.3s ease;
