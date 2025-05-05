@@ -3,13 +3,53 @@ import Slide from "../components/Slide.astro";
 import FullLayout from "../layouts/FullLayout.astro";
 import "../styles/global.css";
 import YujiHome from "../assets/yujihome.webp";
+import cuteYuji1 from "../assets/IMG_0056.webp";
+import cuteYuji2 from "../assets/IMG_0227.webp";
+import cuteYuji3 from "../assets/IMG_0512.webp";
+import cuteYuji4 from "../assets/IMG_1064.webp";
+import cuteYuji5 from "../assets/IMG_1901.webp";
+import cuteYuji6 from "../assets/IMG_5401.webp";
+import cuteYuji7 from "../assets/IMG_5427.webp";
+import cuteYuji8 from "../assets/IMG_5631.webp";
+import cuteYuji9 from "../assets/IMG_5821.webp";
+import cuteYuji10 from "../assets/IMG_7090.webp";
+import Carousel from "../components/Carousel.astro";
+
+const carouselSlides = [
+  cuteYuji1,
+  cuteYuji2,
+  cuteYuji3,
+  cuteYuji4,
+  cuteYuji5,
+  cuteYuji6,
+  cuteYuji7,
+  cuteYuji8,
+  cuteYuji9,
+  cuteYuji10,
+];
 ---
 
 <FullLayout>
-  <div class="text-center">Coming soon...</div>
-  <div class="carousel cursor-pointer rounded-3xl">
-    <Slide imgLocation={YujiHome} />
-    <Slide imgLocation={YujiHome} />
-    <Slide imgLocation={YujiHome} />
-  </div>
+  <Carousel
+    slides={carouselSlides}
+    autoplay={true}
+    interval={3000}
+    showIndicators={true}
+    initialSlide={0}
+  />
+  <!-- <div class="carousel cursor-pointer rounded-3xl">
+    <div class="carousel-item">
+      <Slide imgLocation={cuteYuji1} />
+      <Slide imgLocation={cuteYuji2} />
+      <Slide imgLocation={cuteYuji3} />
+      <Slide imgLocation={cuteYuji4} />
+      <Slide imgLocation={cuteYuji5} />
+      <Slide imgLocation={cuteYuji6} />
+      <Slide imgLocation={cuteYuji7} />
+      <Slide imgLocation={cuteYuji8} />
+      <Slide imgLocation={cuteYuji9} />
+      <Slide imgLocation={cuteYuji10} />
+      <Slide imgLocation={YujiHome} />
+    </div>
+  </div> -->
 </FullLayout>

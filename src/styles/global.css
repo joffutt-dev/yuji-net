@@ -6,6 +6,12 @@ button {
   @apply bg-blue-800 text-white;
 }
 
+button.h-full {
+  @apply btn;
+  @apply bg-blue-800 text-white;
+  height: 100%;
+}
+
 .blue-button {
   @apply btn;
   @apply bg-blue-800 text-white;
