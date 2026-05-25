@@ -1,5 +1,4 @@
 ---
-// Define the props for this component
 interface Props {
   slides: ImageMetadata[];
   autoplay?: boolean;
@@ -8,7 +7,6 @@ interface Props {
   initialSlide?: number;
 }
 
-// Destructure the component props with defaults
 const {
   slides,
   autoplay = false,
@@ -18,180 +16,296 @@ const {
 } = Astro.props;
 ---
 
-<div
-  class="carousel-container"
-  data-autoplay={autoplay}
+<astro-carousel
+  class="carousel-container block"
+  data-autoplay={String(autoplay)}
   data-interval={interval}
+  data-initial-slide={initialSlide}
 >
-  <button
-    id="prev-button"
-    aria-label="previous"
-    class="top-0 left-0 absolute h-full w-1/5 opacity-0 hover:opacity-50 hover:bg-gray-700"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      class="size-20 fill-white ml-auto mr-auto"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5"></path>
-    </svg>
-  </button>
-  <button
-    id="next-button"
-    aria-label="next"
-    class="top-0 right-0 absolute h-full w-1/5 opacity-0 hover:opacity-50 hover:bg-gray-700"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      class="size-20 fill-white ml-auto mr-auto"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"></path>
-    </svg>
-  </button>
-  <div class="carousel rounded-3xl">
+  <div class="carousel-skeleton" aria-hidden="true">
+    <div class="skeleton-image shimmer"></div>
     {
-      slides.map((slide, index) => (
-        <div id={`slide${index}`} class="carousel-item">
-          <img
-            src={slide.src}
-            alt={`Slide ${index + 1}`}
-            class="display-image"
-          />
+      showIndicators && (
+        <div class="skeleton-indicators">
+          {slides.map((_, index) => (
+            <div
+              class={`skeleton-dot shimmer ${index === initialSlide ? "skeleton-dot--active" : ""}`}
+            />
+          ))}
         </div>
-      ))
+      )
     }
   </div>
 
-  {/* Carousel indicators */}
-  {
-    showIndicators && (
-      <div class="flex justify-center w-full py-2 gap-2 carousel-indicators">
-        {slides.map((_, index) => (
-          <button
-            class={`btn btn-xs btn-circle ${index === initialSlide ? "btn-primary" : "btn-ghost"}`}
-            data-slide-index={index}
-          />
-        ))}
-      </div>
-    )
-  }
-</div>
+  <div class="carousel-content" style="display: none;">
+    <button
+      data-carousel-btn="prev"
+      aria-label="previous"
+      class="top-0 left-0 absolute z-10 h-full w-1/5 opacity-0 hover:opacity-50 hover:bg-gray-700 transition-opacity"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        class="size-20 fill-white mx-auto"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5"></path>
+      </svg>
+    </button>
+    <button
+      data-carousel-btn="next"
+      aria-label="next"
+      class="top-0 right-0 absolute z-10 h-full w-1/5 opacity-0 hover:opacity-50 hover:bg-gray-700 transition-opacity"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        class="size-20 fill-white mx-auto"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"></path>
+      </svg>
+    </button>
+
+    <div class="carousel rounded-3xl">
+      {
+        slides.map((slide, index) => (
+          /* Using data attributes instead of IDs to preserve styling rules while maintaining instance scoping */
+          <div data-slide-index={index} class="carousel-item">
+            <img
+              src={slide.src}
+              alt={`Slide ${index + 1}`}
+              class="display-image"
+            />
+          </div>
+        ))
+      }
+    </div>
+
+    {
+      showIndicators && (
+        <div class="flex justify-center w-full py-2 gap-2 carousel-indicators">
+          {slides.map((_, index) => (
+            <button
+              class={`btn btn-xs btn-circle ${index === initialSlide ? "btn-primary" : "btn-ghost"}`}
+              data-indicator-index={index}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</astro-carousel>
 
 <script>
-  // Store the total number of slides
-  const slides = document.querySelectorAll(".carousel-item");
-  const totalSlides = slides.length;
+  class AstroCarousel extends HTMLElement {
+    private currentSlide = 0;
+    private totalSlides = 0;
+    private autoplayInterval: ReturnType<typeof setInterval> | null = null;
 
-  // Current slide index - start with initialSlide or default to 0
-  let currentSlide = 0;
+    private skeleton!: HTMLElement | null;
+    private content!: HTMLElement | null;
+    private indicators!: NodeListOf<HTMLButtonElement>;
+    private prevBtn!: HTMLButtonElement | null;
+    private nextBtn!: HTMLButtonElement | null;
 
-  // Function to go to a specific slide
-  function goToSlide(index: number) {
-    // Make sure index is within bounds
-    const slideIndex = (index + totalSlides) % totalSlides;
-    currentSlide = slideIndex;
+    connectedCallback() {
+      this.skeleton = this.querySelector(".carousel-skeleton");
+      this.content = this.querySelector(".carousel-content");
+      // Select items safely scoped *inside* this specific custom element instance
+      const items = this.querySelectorAll("[data-slide-index]");
+      this.indicators = this.querySelectorAll("[data-indicator-index]");
+      this.prevBtn = this.querySelector('[data-carousel-btn="prev"]');
+      this.nextBtn = this.querySelector('[data-carousel-btn="next"]');
 
-    // Scroll to the slide
-    const slideElement = document.getElementById(`slide${slideIndex}`);
-    if (slideElement) {
-      slideElement.scrollIntoView({ behavior: "smooth" });
+      this.totalSlides = items.length;
+
+      const images = this.querySelectorAll(
+        ".display-image",
+      ) as NodeListOf<HTMLImageElement>;
+      this.initImageLoader(images);
+      this.initControls();
     }
 
-    // Update indicators if they exist
-    const indicators = document.querySelectorAll(".carousel-indicators button");
-    indicators.forEach((indicator, i) => {
-      if (i === slideIndex) {
-        indicator.classList.remove("btn-ghost");
-        indicator.classList.add("btn-primary");
-      } else {
-        indicator.classList.remove("btn-primary");
-        indicator.classList.add("btn-ghost");
+    disconnectedCallback() {
+      this.stopAutoplay();
+    }
+
+    private initImageLoader(images: NodeListOf<HTMLImageElement>) {
+      if (images.length === 0) {
+        this.revealCarousel();
+        return;
       }
-    });
-  }
 
-  // Next slide function
-  function nextSlide() {
-    goToSlide(currentSlide + 1);
-  }
+      let loadedCount = 0;
+      const checkReveal = () => {
+        loadedCount++;
+        if (loadedCount === images.length) this.revealCarousel();
+      };
 
-  // Previous slide function
-  function prevSlide() {
-    goToSlide(currentSlide - 1);
-  }
-
-  // Wait for DOM to be fully loaded
-  document.addEventListener("DOMContentLoaded", () => {
-    // Get navigation buttons
-    const prevButton = document.getElementById("prev-button");
-    const nextButton = document.getElementById("next-button");
-
-    // Add click event listeners
-    if (prevButton) {
-      prevButton.addEventListener("click", prevSlide);
-    }
-
-    if (nextButton) {
-      nextButton.addEventListener("click", nextSlide);
-    }
-
-    // Add event listeners to indicators
-    const indicators = document.querySelectorAll(".carousel-indicators button");
-    indicators.forEach((indicator, index) => {
-      indicator.addEventListener("click", () => {
-        goToSlide(index);
+      images.forEach((img) => {
+        if (img.complete && img.naturalWidth > 0) {
+          checkReveal();
+        } else {
+          img.addEventListener("load", checkReveal);
+          img.addEventListener("error", checkReveal);
+        }
       });
-    });
-
-    // Set up autoplay if enabled
-    const carousel = document.querySelector(".carousel-container");
-    const autoplay = carousel?.getAttribute("data-autoplay") === "true";
-    const interval = parseInt(
-      carousel?.getAttribute("data-interval") || "5000",
-      10
-    );
-
-    let autoplayInterval: string | number | NodeJS.Timeout | null | undefined =
-      null;
-
-    function startAutoplay() {
-      if (autoplay) {
-        autoplayInterval = setInterval(nextSlide, interval);
-      }
     }
 
-    function stopAutoplay() {
-      if (autoplayInterval) {
-        clearInterval(autoplayInterval);
-        autoplayInterval = null;
-      }
+    private revealCarousel() {
+      if (this.skeleton) this.skeleton.style.display = "none";
+      if (this.content) this.content.style.display = "";
+
+      const initialSlideAttr = this.getAttribute("data-initial-slide");
+      this.goToSlide(initialSlideAttr ? parseInt(initialSlideAttr, 10) : 0);
+      this.initAutoplay();
     }
 
-    // Start with the initial slide
-    const initialSlideAttr = carousel?.getAttribute("data-initial-slide");
-    const initialSlide = initialSlideAttr ? parseInt(initialSlideAttr, 10) : 0;
-    goToSlide(initialSlide);
+    private initControls() {
+      this.prevBtn?.addEventListener("click", () =>
+        this.goToSlide(this.currentSlide - 1),
+      );
+      this.nextBtn?.addEventListener("click", () =>
+        this.goToSlide(this.currentSlide + 1),
+      );
 
-    // Start autoplay
-    startAutoplay();
+      this.indicators.forEach((indicator) => {
+        indicator.addEventListener("click", () => {
+          const index = parseInt(
+            indicator.getAttribute("data-indicator-index") || "0",
+            10,
+          );
+          this.goToSlide(index);
+        });
+      });
+    }
 
-    // Pause on hover
-    carousel?.addEventListener("mouseenter", stopAutoplay);
-    carousel?.addEventListener("mouseleave", startAutoplay);
-  });
+    private goToSlide(index: number) {
+      if (this.totalSlides === 0) return;
+
+      this.currentSlide = (index + this.totalSlides) % this.totalSlides;
+
+      // Find the specific slide scoped within this container using data attributes
+      const activeSlide = this.querySelector(
+        `[data-slide-index="${this.currentSlide}"]`,
+      );
+      if (activeSlide) {
+        activeSlide.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "start",
+        });
+      }
+
+      this.indicators.forEach((indicator, i) => {
+        indicator.classList.toggle("btn-ghost", i !== this.currentSlide);
+        indicator.classList.toggle("btn-primary", i === this.currentSlide);
+      });
+    }
+
+    private initAutoplay() {
+      const isAutoplay = this.getAttribute("data-autoplay") === "true";
+      if (!isAutoplay) return;
+
+      const interval = parseInt(
+        this.getAttribute("data-interval") || "5000",
+        10,
+      );
+
+      const start = () => {
+        this.autoplayInterval = setInterval(
+          () => this.goToSlide(this.currentSlide + 1),
+          interval,
+        );
+      };
+
+      start();
+      this.addEventListener("mouseenter", () => this.stopAutoplay());
+      this.addEventListener("mouseleave", start);
+    }
+
+    private stopAutoplay() {
+      if (this.autoplayInterval) {
+        clearInterval(this.autoplayInterval);
+        this.autoplayInterval = null;
+      }
+    }
+  }
+
+  if (!customElements.get("astro-carousel")) {
+    customElements.define("astro-carousel", AstroCarousel);
+  }
 </script>
 
 <style>
+  /* Retained your original styling layout styles completely untouched */
   .carousel-container {
     position: relative;
     overflow: hidden;
+  }
+
+  /* ── Skeleton ── */
+  .carousel-skeleton {
+    width: 100%;
+    border-radius: 1.5rem;
+    overflow: hidden;
+  }
+
+  .skeleton-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 1.5rem;
+  }
+
+  .skeleton-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0 0.75rem;
+  }
+
+  .skeleton-dot {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: oklch(var(--b3, 0.9 0 0));
+  }
+
+  .skeleton-dot--active {
+    background-color: oklch(var(--p, 0.6 0.2 250));
+    opacity: 0.4;
+  }
+
+  /* Shimmer animation */
+  @keyframes skeleton-shimmer {
+    0% {
+      background-position: 200% center;
+    }
+    100% {
+      background-position: -200% center;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      oklch(var(--b2, 0.85 0 0)) 25%,
+      oklch(var(--b3, 0.9 0 0)) 50%,
+      oklch(var(--b2, 0.85 0 0)) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  }
+
+  /* ── Carousel content ── */
+  .carousel-content {
+    position: relative;
   }
 
   .display-image {
