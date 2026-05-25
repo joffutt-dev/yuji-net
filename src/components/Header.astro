@@ -25,7 +25,7 @@
       </ul>
     </div>
 
-    <button id="theme-toggle" aria-label="Toggle theme" class="btn ml-2"
+    <button id="theme-toggle" aria-label="Toggle theme" class="blue-button"
       >🌗</button
     >
   </div>
@@ -53,6 +53,9 @@
     const toggle = document.getElementById("theme-toggle");
     if (!toggle) return;
 
+    const initial = root.getAttribute("data-theme") || "light";
+    setTheme(initial as "light" | "dark"); // syncs the emoji
+
     toggle.addEventListener("click", () => {
       const current = root.getAttribute("data-theme") || "light";
       const next = current === "dark" ? "light" : "dark";
@@ -60,10 +63,10 @@
     });
   }
 
-  // Call setup immediately and also on DOMContentLoaded for safety
-  setupThemeToggle();
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", setupThemeToggle);
+  } else {
+    setupThemeToggle(); // DOM already ready
   }
 </script>
 
