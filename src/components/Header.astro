@@ -2,35 +2,82 @@
 
 ---
 
-<div class="flex p-1">
-  <button id="home-route">Home</button>
+<div class="flex items-center p-1">
+  <div class="flex items-center gap-2">
+    <button id="home-route">Home</button>
+  </div>
 
-  <button class="ml-auto" id="yuji-route">See Yuji</button>
-  <div class="dropdown dropdown-hover">
-    <div tabindex={0} class="blue-button">See other cute pets</div>
-    <!-- <div role="button" class="btn m-1">Hover</div> -->
-    <ul
-      tabindex={0}
-      class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+  <div class="ml-auto flex items-center gap-2">
+    <button id="yuji-route">See Yuji</button>
+
+    <div class="dropdown dropdown-hover">
+      <div tabindex={0} class="blue-button">See other cute pets</div>
+      <ul
+        tabindex={0}
+        class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+      >
+        <li>
+          <a href={import.meta.env.PUBLIC_SULLY_URL} target="_">See Sully</a>
+        </li>
+        <li>
+          <a href={import.meta.env.PUBLIC_TONKS_URL} target="_">See Tonks</a>
+        </li>
+      </ul>
+    </div>
+
+    <button id="theme-toggle" aria-label="Toggle theme" class="btn ml-2"
+      >🌗</button
     >
-      <li>
-        <a href={import.meta.env.PUBLIC_SULLY_URL} target="_">See Sully</a>
-      </li>
-      <li>
-        <a href={import.meta.env.PUBLIC_TONKS_URL} target="_">See Tonks</a>
-      </li>
-    </ul>
   </div>
 </div>
 
 <script>
+  // Theme toggle: set data-theme on <html> to "light" or "dark"
+  const themeKey = "theme";
+  const root = document.documentElement;
+
+  /**
+   * @param {'light'|'dark'} t
+   */
+  function setTheme(t: "light" | "dark") {
+    root.setAttribute("data-theme", t);
+    localStorage.setItem(themeKey, t);
+    const toggle = document.getElementById("theme-toggle");
+    if (toggle) {
+      toggle.textContent = t === "dark" ? "🌙" : "☀️";
+    }
+  }
+
+  // Setup theme toggle button
+  function setupThemeToggle() {
+    const toggle = document.getElementById("theme-toggle");
+    if (!toggle) return;
+
+    toggle.addEventListener("click", () => {
+      const current = root.getAttribute("data-theme") || "light";
+      const next = current === "dark" ? "light" : "dark";
+      setTheme(next);
+    });
+  }
+
+  // Call setup immediately and also on DOMContentLoaded for safety
+  setupThemeToggle();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupThemeToggle);
+  }
+</script>
+
+<script>
+  // make env values explicit for TypeScript and bundler
+  const BASE = import.meta.env.PUBLIC_BASE_URL ?? "";
+
   const yujiRoute = document.getElementById("yuji-route");
   yujiRoute?.addEventListener("click", () => {
-    window.location.href = `${import.meta.env.PUBLIC_BASE_URL}/see-yuji`;
+    window.location.href = `${BASE}/see-yuji`;
   });
 
   const homeRoute = document.getElementById("home-route");
   homeRoute?.addEventListener("click", () => {
-    window.location.href = `${import.meta.env.PUBLIC_BASE_URL}/`;
+    window.location.href = `${BASE}/`;
   });
 </script>

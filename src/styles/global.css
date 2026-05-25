@@ -1,6 +1,51 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --primary: #1e3a8a;
+  --primary-contrast: #ffffff;
+  --btn-bg: var(--primary);
+  --btn-text: var(--primary-contrast);
+  --btn-hover: #17327a;
+  --btn-active: #12255e;
+}
+
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #081028;
+  --text: #e6eef8;
+  --muted: #94a3b8;
+  --primary: #60a5fa;
+  --primary-contrast: #0b1220;
+  --btn-bg: var(--primary);
+  --btn-text: var(--primary-contrast);
+  --btn-hover: #4f8ee6;
+  --btn-active: #3e76cc;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Buttons use CSS variables so they adapt to theme */
+.btn {
+  background-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border: none !important;
+}
+.btn:hover {
+  background-color: var(--btn-hover) !important;
+}
+.btn:active {
+  background-color: var(--btn-active) !important;
+  transform: translateY(1px);
+}
+
 button {
   @apply btn;
   @apply bg-blue-800 text-white;
